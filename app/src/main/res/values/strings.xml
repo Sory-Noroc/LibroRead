@@ -7,9 +7,9 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_all_books">All Books</string>
+    <string name="menu_favorites">Favorites</string>
+    <string name="menu_started_books">Started Books</string>
     <string name="cover_of_the_book">The cover of the book</string>
     <string name="heart_icon">Heart Icon</string>
 </resources>

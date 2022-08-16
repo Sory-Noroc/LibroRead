@@ -1,17 +1,16 @@
-package com.sorykhan.libroread.ui.startedBooks
+package com.sorykhan.libroread
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.sorykhan.libroread.databinding.FragmentSlideshowBinding
+import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
 
-class StartedBooksFragment : Fragment() {
+class AllBooksFragment : Fragment() {
 
-    private var _binding: FragmentSlideshowBinding? = null
+    private var _binding: FragmentAllBooksBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,16 +21,12 @@ class StartedBooksFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val slideshowViewModel =
-            ViewModelProvider(this).get(StartedBooksViewModel::class.java)
+//        val allBooksViewModel =
+//            ViewModelProvider(this).get(AllBooksViewModel::class.java)
 
-        _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
+        _binding = FragmentAllBooksBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
-        slideshowViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
         return root
     }
 
