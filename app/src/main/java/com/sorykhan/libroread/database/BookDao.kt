@@ -22,7 +22,7 @@ interface BookDao {
 
 // @Query("INSERT INTO Book (book_name, path, size) VALUES(:name, :path, :size)")
  @Insert
- fun insertBook(name: String, path: String, size: Long)
+ fun insertBook(book: Book)
 
 // @Query("UPDATE Book SET progress = :progress WHERE path = :path")
  @Update
