@@ -24,11 +24,9 @@ interface BookDao {
  @Insert
  fun insertBook(book: Book)
 
-// @Query("UPDATE Book SET progress = :progress WHERE path = :path")
- @Update
+ @Query("UPDATE Book SET progress = :progress WHERE path = :path")
  suspend fun updateProgress(path: String, progress: Double)
 
-// @Query("UPDATE Book SET is_favorite = :is_favorite WHERE path = :path")
- @Update
+ @Query("UPDATE Book SET is_favorite = :is_favorite WHERE path = :path")
  suspend fun updateIsFavorite(path: String, is_favorite: Boolean)
 }

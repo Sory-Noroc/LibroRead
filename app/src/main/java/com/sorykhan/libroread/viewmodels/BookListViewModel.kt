@@ -23,7 +23,7 @@ class BookListViewModel(private val bookDao: BookDao): ViewModel() {
     fun insertBook(name: String, path: String) {  // Should be called before the UI is even built
         val size = File(path).length()
         viewModelScope.launch {
-            bookDao.insertBook(name, path, size)
+            bookDao.insertBook(Book(bookName=name, bookPath=path, bookSize=size))
         }
     }
 
