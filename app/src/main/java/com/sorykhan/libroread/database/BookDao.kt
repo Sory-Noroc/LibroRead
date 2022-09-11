@@ -20,7 +20,6 @@ interface BookDao {
  @Query("SELECT * FROM Book WHERE book_name = :search ORDER BY book_name")
  fun getBySearch(search: String): Flow<List<Book>>
 
-// @Query("INSERT INTO Book (book_name, path, size) VALUES(:name, :path, :size)")
  @Insert
  fun insertBook(book: Book)
 

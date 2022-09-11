@@ -5,13 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.adapter.BookItemAdapter
 import com.sorykhan.libroread.database.Book
+import com.sorykhan.libroread.database.InventoryApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
 import com.sorykhan.libroread.viewmodels.BookListViewModel
+import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 
 class AllBooksFragment : Fragment() {
 
@@ -22,24 +24,30 @@ class AllBooksFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var recyclerView: RecyclerView
     private lateinit var datasource: List<Book>
+    private val sharedViewModel: BookListViewModel by activityViewModels {
+        BookListViewModelFactory(
+            (activity?.application as InventoryApplication).database
+                .bookDao()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val sharedViewModel = ViewModelProvider(this).get(BookListViewModel::class.java)
+//        val sharedViewModel = ViewModelProvider(this).get(BookListViewModel::class.java)
         datasource = sharedViewModel.getAllBooks().value ?: emptyList()
 
         _binding = FragmentAllBooksBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = binding.allBooksRecyclerView
         recyclerView.adapter = BookItemAdapter(requireContext(), datasource)
+        recyclerView.setHasFixedSize(true)
     }
 
     override fun onDestroyView() {

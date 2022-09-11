@@ -1,14 +1,12 @@
 package com.sorykhan.libroread.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookDao
 import com.sorykhan.libroread.utils.PdfUtils
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.IllegalArgumentException
 
 class BookListViewModel(private val bookDao: BookDao): ViewModel() {
 
@@ -17,8 +15,6 @@ class BookListViewModel(private val bookDao: BookDao): ViewModel() {
     fun getStartedBooks() = bookDao.getStartedBooks().asLiveData()
     fun getFavoriteBooks() = bookDao.getFavoriteBooks().asLiveData()
     fun getBooksBySearch(search: String) = bookDao.getBySearch(search).asLiveData()
-
-    var currentList = getAllBooks()
 
     fun insertBook(name: String, path: String) {  // Should be called before the UI is even built
         val size = File(path).length()
@@ -37,5 +33,15 @@ class BookListViewModel(private val bookDao: BookDao): ViewModel() {
         viewModelScope.launch {
             bookDao.updateIsFavorite(path, isFavorite)
         }
+    }
+}
+
+class BookListViewModelFactory(private val bookDao: BookDao): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(BookListViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return BookListViewModel(bookDao) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
