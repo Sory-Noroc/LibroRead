@@ -3,6 +3,7 @@ package com.sorykhan.libroread
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -12,15 +13,22 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.sorykhan.libroread.database.Book
+import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.ActivityMainBinding
+import com.sorykhan.libroread.utils.PdfUtils
+import com.sorykhan.libroread.viewmodels.BookListViewModel
+import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private val utils = PdfUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,5 +70,13 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(androidx.navigation.fragment.R.id.nav_host_fragment_container)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    fun uploadToDatabase() {
+        for (pdf in utils.getPDFs(utils.downloadsPath)) {
+            val (name, path, size) = utils.getPdfInfo(pdf)
+            val book: Book = Book(bookName = name, bookPath = path, bookSize = size)
+            (application as BookApplication).database.bookDao().insertBook(book)
+        }
     }
 }

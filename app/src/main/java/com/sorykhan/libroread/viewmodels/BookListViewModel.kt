@@ -10,6 +10,8 @@ import java.lang.IllegalArgumentException
 
 class BookListViewModel(private val bookDao: BookDao): ViewModel() {
 
+    private val utils = PdfUtils()
+
     // Keeping them as functions instead of variables to preserve space
     fun getAllBooks(): LiveData<List<Book>> = bookDao.getAll().asLiveData()
     fun getStartedBooks() = bookDao.getStartedBooks().asLiveData()
