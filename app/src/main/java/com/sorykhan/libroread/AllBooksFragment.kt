@@ -6,11 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.adapter.BookItemAdapter
 import com.sorykhan.libroread.database.Book
-import com.sorykhan.libroread.database.InventoryApplication
+import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
 import com.sorykhan.libroread.viewmodels.BookListViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
@@ -26,7 +25,7 @@ class AllBooksFragment : Fragment() {
     private lateinit var datasource: List<Book>
     private val sharedViewModel: BookListViewModel by activityViewModels {
         BookListViewModelFactory(
-            (activity?.application as InventoryApplication).database
+            (activity?.application as BookApplication).database
                 .bookDao()
         )
     }
