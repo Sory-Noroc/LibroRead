@@ -13,15 +13,16 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.ActivityMainBinding
 import com.sorykhan.libroread.utils.PdfUtils
-import com.sorykhan.libroread.viewmodels.BookListViewModel
-import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
+import kotlinx.coroutines.launch
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
