@@ -1,18 +1,24 @@
 package com.sorykhan.libroread
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.coroutineScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.sorykhan.libroread.adapter.BookItemAdapter
+import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
-import com.sorykhan.libroread.viewmodels.BookListViewModel
+import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
+import kotlinx.coroutines.launch
+
+private const val TAG = "AllBooksFragment"
 
 class AllBooksFragment : Fragment() {
 
@@ -23,7 +29,8 @@ class AllBooksFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var recyclerView: RecyclerView
     private lateinit var datasource: List<Book>
-    private val sharedViewModel: BookListViewModel by activityViewModels {
+
+    private val viewModel: AllBooksViewModel by activityViewModels {
         BookListViewModelFactory(
             (activity?.application as BookApplication).database
                 .bookDao()
@@ -35,8 +42,7 @@ class AllBooksFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val sharedViewModel = ViewModelProvider(this).get(BookListViewModel::class.java)
-        datasource = sharedViewModel.getAllBooks().value ?: emptyList()
+        Log.d(TAG, "Datasource: $datasource")
 
         _binding = FragmentAllBooksBinding.inflate(inflater, container, false)
 
@@ -45,8 +51,18 @@ class AllBooksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = binding.allBooksRecyclerView
-        recyclerView.adapter = BookItemAdapter(requireContext(), datasource)
-        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val bookAdapter = BookAdapter({
+            TODO("When item clicked, go to activity of reading this book")
+        })
+        recyclerView.adapter = bookAdapter
+
+        lifecycle.coroutineScope.launch {
+            viewModel.getAllBooks().collect() {
+                bookAdapter.submitList(it)
+            }
+        }
     }
 
     override fun onDestroyView() {
