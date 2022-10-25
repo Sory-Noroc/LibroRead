@@ -1,9 +1,17 @@
 package com.sorykhan.libroread
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.pdf.PdfRenderer
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
+import android.provider.Settings
+import android.util.Log
 import android.view.Menu
 import android.view.View
-import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -34,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        uploadToDatabase(this)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -60,7 +70,8 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    fun updateFavorite(view: View) {}
+    fun updateFavorite(view: View) {
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -73,11 +84,22 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun uploadToDatabase() {
+    // In viewModel
+    private fun uploadToDatabase(context: Context) {
+        Log.i(TAG, "In UploadToDatabase function!!")
+        val downloads = utils.getDownloadsFiles(context)
         for (pdf in utils.getPDFs(utils.downloadsPath)) {
             val (name, path, size) = utils.getPdfInfo(pdf)
-            val book: Book = Book(bookName = name, bookPath = path, bookSize = size)
-            (application as BookApplication).database.bookDao().insertBook(book)
+            val renderer = PdfRenderer(ParcelFileDescriptor.open(pdf, ParcelFileDescriptor.MODE_READ_ONLY))
+            val book = Book(
+                bookName = name,
+                bookPath = path,
+                bookSize = size,
+                bookPages = renderer.pageCount)
+            Log.w(TAG, "Book: $book")
+            lifecycleScope.launch {
+                (application as BookApplication).database.bookDao().insertBook(book)
+            }
         }
     }
 }

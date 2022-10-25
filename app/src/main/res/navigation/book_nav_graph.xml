@@ -3,23 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_all_books">
+    app:startDestination="@id/nav_all_books">
 
     <fragment
         android:id="@+id/nav_all_books"
         android:name="com.sorykhan.libroread.AllBooksFragment"
         android:label="@string/menu_all_books"
-        tools:layout="@layout/fragment_all_books" />
+        tools:layout="@layout/fragment_all_books" >
+        <action
+            android:id="@+id/action_nav_all_books_to_nav_favorites"
+            app:destination="@id/nav_favorites" />
+        <action
+            android:id="@+id/action_nav_all_books_to_nav_started_books"
+            app:destination="@id/nav_started_books" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_favorites"
         android:name="com.sorykhan.libroread.FavoritesFragment"
         android:label="@string/menu_favorites"
-        tools:layout="@layout/fragment_favorites" />
+        tools:layout="@layout/fragment_favorites" >
+        <action
+            android:id="@+id/action_nav_favorites_to_nav_started_books"
+            app:destination="@id/nav_started_books" />
+        <action
+            android:id="@+id/action_nav_favorites_to_nav_all_books"
+            app:destination="@id/nav_all_books" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_started_books"
         android:name="com.sorykhan.libroread.StartedBooksFragment"
         android:label="@string/menu_started_books"
-        tools:layout="@layout/fragment_started_books" />
+        tools:layout="@layout/fragment_started_books" >
+        <action
+            android:id="@+id/action_nav_started_books_to_nav_favorites"
+            app:destination="@id/nav_favorites" />
+        <action
+            android:id="@+id/action_nav_started_books_to_nav_all_books"
+            app:destination="@id/nav_all_books" />
+    </fragment>
 </navigation>

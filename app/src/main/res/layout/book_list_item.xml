@@ -2,12 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/book_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         app:srcCompat="@drawable/ic_baseline_picture_as_pdf_24"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -15,11 +17,13 @@
         android:contentDescription="@string/cover_of_the_book"/>
 
     <TextView
+        style="?attr/textAppearanceBody1"
         android:id="@+id/book_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/book_image"/>
+        app:layout_constraintLeft_toRightOf="@id/book_image"
+        tools:text="My title example"/>
 
     <TextView
         android:id="@+id/book_size"
@@ -30,11 +34,15 @@
 
     <ProgressBar
         android:id="@+id/book_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:max="100000"
-        app:layout_constraintLeft_toRightOf="@id/book_image"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_marginEnd="12dp"
+        android:indeterminate="false"
+        android:minWidth="260dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/favorite_button"
+        app:layout_constraintLeft_toRightOf="@id/book_image" />
 
     <ImageButton
         android:id="@+id/favorite_button"
@@ -42,16 +50,17 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/heart_icon"
         android:onClick="updateFavorite"
-        app:srcCompat="@drawable/ic_baseline_star_outline_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/book_progress_bar"/>
+        app:layout_constraintRight_toLeftOf="@id/options_button"
+        app:srcCompat="@drawable/ic_baseline_star_outline_24" />
 
     <ImageButton
         android:id="@+id/options_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_baseline_options_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toRightOf="@id/favorite_button"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:srcCompat="@drawable/ic_baseline_options_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
