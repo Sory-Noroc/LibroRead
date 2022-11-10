@@ -90,12 +90,11 @@ class MainActivity : AppCompatActivity() {
         val downloads = utils.getDownloadsFiles(context)
         for (pdf in utils.getPDFs(utils.downloadsPath)) {
             val (name, path, size) = utils.getPdfInfo(pdf)
-            val renderer = PdfRenderer(ParcelFileDescriptor.open(pdf, ParcelFileDescriptor.MODE_READ_ONLY))
             val book = Book(
                 bookName = name,
                 bookPath = path,
                 bookSize = size,
-                bookPages = renderer.pageCount)
+                bookPages = 10)  // TODO: Test value!
             Log.w(TAG, "Book: $book")
             lifecycleScope.launch {
                 (application as BookApplication).database.bookDao().insertBook(book)
