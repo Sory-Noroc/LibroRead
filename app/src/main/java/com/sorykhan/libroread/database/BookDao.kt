@@ -11,13 +11,13 @@ interface BookDao {
  @Query("SELECT * FROM Book WHERE progress <> 0 ORDER BY book_name")
  fun getStartedBooks(): Flow<List<Book>>
 
- @Query("SELECT * FROM Book WHERE is_favorite = 1 ORDER BY book_name")
- fun getFavoriteBooks(): Flow<List<Book>>
+ @Query("SELECT * FROM Book WHERE is_favorite = :is_favorite ORDER BY book_name")
+ fun getFavoriteBooks(is_favorite: Boolean = true): Flow<List<Book>>
 
- @Query("SELECT * FROM Book WHERE book_name = :search ORDER BY book_name")
- fun getBySearch(search: String): Flow<List<Book>>
+ @Query("SELECT * FROM Book WHERE book_name = :search LIMIT 1")
+ fun getBySearch(search: String): Flow<Book>
 
- @Insert
+ @Insert(onConflict = OnConflictStrategy.REPLACE)
  suspend fun insertBook(book: Book)
 
  @Delete

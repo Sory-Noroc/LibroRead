@@ -42,8 +42,6 @@ class AllBooksFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, "Datasource: $datasource")
-
         _binding = FragmentAllBooksBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -53,9 +51,9 @@ class AllBooksFragment : Fragment() {
         recyclerView = binding.allBooksRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val bookAdapter = BookAdapter({
+        val bookAdapter = BookAdapter {
             TODO("When item clicked, go to activity of reading this book")
-        })
+        }
         recyclerView.adapter = bookAdapter
 
         lifecycle.coroutineScope.launch {
