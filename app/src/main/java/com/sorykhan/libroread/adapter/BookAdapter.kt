@@ -1,5 +1,6 @@
 package com.sorykhan.libroread.adapter
 
+import android.os.FileUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.R
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.databinding.BookListItemBinding
+import com.sorykhan.libroread.utils.FormatUtils
 import com.sorykhan.libroread.utils.getStringMemoryFormat
 
 class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, BookAdapter.ItemViewHolder>(DiffCallback) {
@@ -29,8 +31,7 @@ class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, 
         fun bind(book: Book) {
             binding.bookTitle.text = book.bookName
             binding.bookSize.text = getStringMemoryFormat(book.bookSize)
-            binding.bookProgressBar.progress = book.bookProgress
-            binding.bookProgressBar.max = book.bookPages
+            binding.progressView.text = FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages)
             binding.favoriteButton.setImageResource(getFavoriteImageResource(book.isFavorite))
         }
     }
