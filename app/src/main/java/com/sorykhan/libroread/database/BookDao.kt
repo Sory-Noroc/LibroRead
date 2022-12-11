@@ -17,8 +17,8 @@ interface BookDao {
  @Query("SELECT is_favorite FROM Book WHERE path = :path")
  fun getBookFavoriteStatus(path: String): Boolean
 
- @Query("SELECT * FROM Book WHERE book_name = :search LIMIT 1")
- fun getBySearch(search: String): Flow<Book>
+ @Query("SELECT * FROM Book WHERE book_name = :bookName LIMIT 1")
+ fun getBySearch(bookName: String): Book?
 
  @Insert(onConflict = OnConflictStrategy.REPLACE)
  suspend fun insertBook(book: Book)

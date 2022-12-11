@@ -1,5 +1,7 @@
 package com.sorykhan.libroread.viewmodels
 
+import android.os.Environment
+import android.util.Log
 import androidx.lifecycle.*
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookDao
@@ -8,7 +10,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
+private const val TAG = "AllBooksViewModel"
+
 class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
+
+    fun uploadToDatabase() {
+//        val downloads = PdfUtils.getDownloadsFiles(context)
+        val downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
+        Log.i(TAG, "Downloads path: $downloadsPath")
+        for (pdf in PdfUtils.getPDFs(downloadsPath)) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val bookInDbName = bookDao.getBySearch(pdf.name)
+                if (bookInDbName == null) {
+                    Log.i(TAG, "Book not already in DB, have to insert")
+                    insertBook(pdf)
+                }
+            }
+        }
+    }
 
     // Keeping them as functions instead of variables to preserve space
     fun getAllBooks() = bookDao.getAll()
@@ -17,16 +36,17 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 //    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
 //    suspend fun deleteBook(book: Book) = bookDao.deleteBook(book)
 
-    fun insertBook(name: String, path: String) {  // Should be called before the UI is even built
-        val file = File(path)
-        viewModelScope.launch {
-            bookDao.insertBook(Book(
-                bookName=name,
-                bookPath=path,
-                bookPages = PdfUtils.getPdfPageCount(file),
-                bookSize=file.length()
-            ))
-        }
+    private suspend fun insertBook(file: File) {  // Should be called before the UI is even built
+        val (name, path, size) = PdfUtils.getPdfInfo(file)
+        val pageCount: Int = PdfUtils.getPdfPageCount(file) ?: 0
+        val book = Book(
+            bookName=name,
+            bookPath=path,
+            bookPages = pageCount,
+            bookSize=size
+        )
+        bookDao.insertBook(book)
+        Log.d(TAG, "Book: $book")
     }
 
     fun updateProgress(path: String, progress: Int) {

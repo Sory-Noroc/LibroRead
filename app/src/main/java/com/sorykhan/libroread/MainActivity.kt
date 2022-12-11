@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -20,6 +22,8 @@ import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.ActivityMainBinding
 import com.sorykhan.libroread.utils.PdfUtils
+import com.sorykhan.libroread.viewmodels.AllBooksViewModel
+import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
@@ -29,11 +33,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private val viewModel: AllBooksViewModel by viewModels {
+        BookListViewModelFactory(
+            (application as BookApplication).database
+                .bookDao()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        uploadToDatabase(this)
+        viewModel.uploadToDatabase()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -70,23 +80,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_books_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    // In viewModel
-    private fun uploadToDatabase(context: Context) {
-        val downloads = PdfUtils.getDownloadsFiles(context)
-        for (pdf in PdfUtils.getPDFs(PdfUtils.downloadsPath)) {
-            val (name, path, size) = PdfUtils.getPdfInfo(pdf)
-            val book = Book(
-                bookName = name,
-                bookPath = path,
-                bookSize = size,
-                bookPages = 10)  // TODO: Test value!
-            Log.d(TAG, "Book: $book")
-//            TODO("Add book only if not already in DB")
-//            lifecycleScope.launch {
-//                (application as BookApplication).database.bookDao().insertBook(book)
-//            }
-        }
     }
 }
