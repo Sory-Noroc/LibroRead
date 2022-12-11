@@ -1,29 +1,21 @@
 package com.sorykhan.libroread
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.pdf.PdfRenderer
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.ParcelFileDescriptor
-import android.provider.MediaStore
-import android.provider.Settings
 import android.util.Log
 import android.view.Menu
-import android.view.View
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.ActivityMainBinding
@@ -37,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private val utils = PdfUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,9 +61,6 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    fun updateFavorite(view: View) {
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
@@ -86,19 +74,19 @@ class MainActivity : AppCompatActivity() {
 
     // In viewModel
     private fun uploadToDatabase(context: Context) {
-        Log.i(TAG, "In UploadToDatabase function!!")
-        val downloads = utils.getDownloadsFiles(context)
-        for (pdf in utils.getPDFs(utils.downloadsPath)) {
-            val (name, path, size) = utils.getPdfInfo(pdf)
+        val downloads = PdfUtils.getDownloadsFiles(context)
+        for (pdf in PdfUtils.getPDFs(PdfUtils.downloadsPath)) {
+            val (name, path, size) = PdfUtils.getPdfInfo(pdf)
             val book = Book(
                 bookName = name,
                 bookPath = path,
                 bookSize = size,
                 bookPages = 10)  // TODO: Test value!
-            Log.w(TAG, "Book: $book")
-            lifecycleScope.launch {
-                (application as BookApplication).database.bookDao().insertBook(book)
-            }
+            Log.d(TAG, "Book: $book")
+//            TODO("Add book only if not already in DB")
+//            lifecycleScope.launch {
+//                (application as BookApplication).database.bookDao().insertBook(book)
+//            }
         }
     }
 }

@@ -1,8 +1,9 @@
 package com.sorykhan.libroread.adapter
 
-import android.os.FileUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,8 +12,14 @@ import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.databinding.BookListItemBinding
 import com.sorykhan.libroread.utils.FormatUtils
 import com.sorykhan.libroread.utils.getStringMemoryFormat
+import com.sorykhan.libroread.viewmodels.AllBooksViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
-class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, BookAdapter.ItemViewHolder>(DiffCallback) {
+private const val TAG = "BookAdapter"
+
+class BookAdapter(val viewModel: AllBooksViewModel, private val onItemClicked: (Book) -> Unit): ListAdapter<Book, BookAdapter.ItemViewHolder>(DiffCallback) {
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Book>() {
             override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean {
@@ -22,17 +29,22 @@ class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, 
             override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean {
                 return oldItem == newItem
             }
-
         }
     }
 
     inner class ItemViewHolder(private var binding: BookListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(book: Book) {
+            Log.i(TAG, "Binding the book $book")
             binding.bookTitle.text = book.bookName
             binding.bookSize.text = getStringMemoryFormat(book.bookSize)
             binding.progressView.text = FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages)
             binding.favoriteButton.setImageResource(getFavoriteImageResource(book.isFavorite))
+            binding.favoriteButton.setOnClickListener {
+                Log.d(TAG, "Before updating favorite button")
+                viewModel.updateIsFavorite(book.bookPath)
+                Log.d(TAG, "After updating")
+            }
         }
     }
 
@@ -52,6 +64,7 @@ class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, 
                 false
             )
         )
+        Log.i(TAG, "Creating the ViewHolder")
         viewHolder.itemView.setOnClickListener {
             val position = viewHolder.adapterPosition
             onItemClicked(getItem(position))
@@ -62,5 +75,6 @@ class BookAdapter(private val onItemClicked: (Book) -> Unit): ListAdapter<Book, 
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.bind(getItem(position))
+        Log.i(TAG, "Binding the viewHolder")
     }
 }

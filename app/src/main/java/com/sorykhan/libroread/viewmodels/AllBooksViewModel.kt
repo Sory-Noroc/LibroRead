@@ -4,19 +4,18 @@ import androidx.lifecycle.*
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookDao
 import com.sorykhan.libroread.utils.PdfUtils
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.IllegalArgumentException
 
 class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 
     // Keeping them as functions instead of variables to preserve space
     fun getAllBooks() = bookDao.getAll()
-    fun getStartedBooks() = bookDao.getStartedBooks()
-    fun getFavoriteBooks() = bookDao.getFavoriteBooks()
-    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
-    suspend fun deleteBook(book: Book) = bookDao.deleteBook(book)
+//    fun getStartedBooks() = bookDao.getStartedBooks()
+//    fun getFavoriteBooks() = bookDao.getFavoriteBooks()
+//    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
+//    suspend fun deleteBook(book: Book) = bookDao.deleteBook(book)
 
     fun insertBook(name: String, path: String) {  // Should be called before the UI is even built
         val file = File(path)
@@ -24,7 +23,7 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
             bookDao.insertBook(Book(
                 bookName=name,
                 bookPath=path,
-                bookPages = PdfUtils().getPdfPageCount(file),
+                bookPages = PdfUtils.getPdfPageCount(file),
                 bookSize=file.length()
             ))
         }

@@ -11,12 +11,12 @@ import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.adapter.BookAdapter
-import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 import kotlinx.coroutines.launch
+
 
 private const val TAG = "AllBooksFragment"
 
@@ -28,7 +28,6 @@ class AllBooksFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var recyclerView: RecyclerView
-    private lateinit var datasource: List<Book>
 
     private val viewModel: AllBooksViewModel by activityViewModels {
         BookListViewModelFactory(
@@ -43,22 +42,25 @@ class AllBooksFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAllBooksBinding.inflate(inflater, container, false)
-
+        Log.i(TAG, "Creating the views of the fragment")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = binding.allBooksRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        Log.i(TAG, "Linked layout to recyclerView")
 
-        val bookAdapter = BookAdapter {
+        val bookAdapter = BookAdapter(viewModel) {
             TODO("When item clicked, go to activity of reading this book")
         }
         recyclerView.adapter = bookAdapter
+        Log.i(TAG, "Linked adapter to it's recyclerView")
 
         lifecycle.coroutineScope.launch {
-            viewModel.getAllBooks().collect() {
+            viewModel.getAllBooks().collect {
                 bookAdapter.submitList(it)
+                Log.i(TAG, "Extracted the books from the DB and sent them to the adapter")
             }
         }
     }
