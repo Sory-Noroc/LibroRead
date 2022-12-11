@@ -35,9 +35,10 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
         }
     }
 
-    fun updateIsFavorite(path: String, isFavorite: Boolean) {
-        viewModelScope.launch {
-            bookDao.updateIsFavorite(path, isFavorite)
+    fun updateIsFavorite(path: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val isFavorite = bookDao.getBookFavoriteStatus(path)
+            bookDao.updateIsFavorite(path, !isFavorite)
         }
     }
 }
