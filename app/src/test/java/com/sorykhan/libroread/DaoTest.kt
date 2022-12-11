@@ -124,7 +124,7 @@ class DaoTest {
     @Test
     fun getFavoriteBooks() {
         val books = listOf(
-            Book(bookName = "Book 1", bookPath = "C:1", bookPages = 44, bookSize = 12, bookProgress = 1207),
+            Book(bookName = "Book 1", bookPath = "C:1", bookSize = 12, bookPages = 44, bookProgress = 1207),
             Book(bookName = "Book 2", bookPath = "C:2", bookSize = 1, bookPages = 45),
             Book(bookName = "Book 3", bookPath = "C:3", bookSize = 123, bookPages = 78, isFavorite = true),
             Book(bookName = "Book 4", bookPath = "C:4", bookSize = 1234, bookPages = 42, isFavorite = true)
@@ -135,12 +135,13 @@ class DaoTest {
                 bookDao.insertBook(it)
             }
         }
+
         val expectedBooks = listOf(
             Book(id = 3, bookName = "Book 3", bookPath = "C:3", bookSize = 123, isFavorite = true, bookPages = 78),
             Book(id = 4, bookName = "Book 4", bookPath = "C:4", bookSize = 1234, isFavorite = true, bookPages = 42)
         )
 
-        val favoriteBooks = bookDao.getStartedBooks().asLiveData().getOrAwaitValue()
+        val favoriteBooks = bookDao.getFavoriteBooks().asLiveData().getOrAwaitValue()
         assertEquals(expectedBooks, favoriteBooks)
     }
 }

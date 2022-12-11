@@ -14,76 +14,78 @@ private const val TAG = "PdfUtils"
 
 class PdfUtils {
 
-    val downloadsPath = "/storage/emulated/0/Download/"
+    companion object {
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun hasAllFilesPermission() = Environment.isExternalStorageManager()
+        const val downloadsPath = "/storage/emulated/0/Download/"
 
-    fun getDownloadsFiles(context: Context):Array<String> {
-        /**
-         *
-         */
-        if (Build.VERSION.SDK_INT >= 30) {
-            if (hasAllFilesPermission()) {
-                return File(downloadsPath).list() ?: emptyArray()
-            } else {
-                requestFilePermission(context)
+        @RequiresApi(Build.VERSION_CODES.R)
+        private fun hasAllFilesPermission() = Environment.isExternalStorageManager()
 
-                val filesArray = File(downloadsPath).list()
-                if (filesArray != null) {
-                    return filesArray
+        fun getDownloadsFiles(context: Context): Array<String> {
+            /**
+             *
+             */
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (hasAllFilesPermission()) {
+                    return File(downloadsPath).list() ?: emptyArray()
                 } else {
-                    getDownloadsFiles(context)
+                    requestFilePermission(context)
+
+                    val filesArray = File(downloadsPath).list()
+                    if (filesArray != null) {
+                        return filesArray
+                    } else {
+                        getDownloadsFiles(context)
+                    }
                 }
+            } else {
+                return File(downloadsPath).list() ?: emptyArray()
             }
+            return emptyArray()
         }
-        else {
-            return File(downloadsPath).list() ?: emptyArray()
-        }
-        return emptyArray()
-    }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    fun requestFilePermission(context: Context) {
-        context.startActivity(
-            Intent(
-                Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
+        @RequiresApi(Build.VERSION_CODES.R)
+        fun requestFilePermission(context: Context) {
+            context.startActivity(
+                Intent(
+                    Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
+                )
             )
-        )
-    }
+        }
 
-    fun getPDFs(location: String): List<File> {
-        /**
-         * Input: Path String; ex. "/home/Docs"
-         */
-        val path = File(location)
-        val allFiles: Array<File> = path.listFiles() ?: return listOf()
-        val pdfFiles = allFiles.filter { it.path.endsWith(".pdf") }
-//        Log.i(TAG, "Pdf Files extracted: $pdfFiles")
-        return pdfFiles
-    }
+        fun getPDFs(location: String): List<File> {
+            /**
+             * Input: Path String; ex. "/home/Docs"
+             */
+            val path = File(location)
+            val allFiles: Array<File> = path.listFiles() ?: return listOf()
+            //        Log.i(TAG, "Pdf Files extracted: $pdfFiles")
+            return allFiles.filter { it.path.endsWith(".pdf") }
+        }
 
-    fun getPDFsRecursively(location: String = "/"): List<File> {
-        /**
-         * Input: A path to the starting directory to walk; default: walk the entire system
-         */
-        val path = File(location)
-        return path.walkTopDown().filter{ it.path.endsWith(".pdf") }.toList()
-    }
+        fun getPDFsRecursively(location: String = "/"): List<File> {
+            /**
+             * Input: A path to the starting directory to walk; default: walk the entire system
+             */
+            val path = File(location)
+            return path.walkTopDown().filter { it.path.endsWith(".pdf") }.toList()
+        }
 
-    fun getPdfInfo(file: File): Triple<String, String, Long> {
-        return Triple(file.name, file.absolutePath, file.length())
-    }
+        fun getPdfInfo(file: File): Triple<String, String, Long> {
+            return Triple(file.name, file.absolutePath, file.length())
+        }
 
-    fun getAllPdfInfo(files: List<File>): List<Triple<String, String, Long>> {
-        return files.map { getPdfInfo(it) }
-    }
+        fun getAllPdfInfo(files: List<File>): List<Triple<String, String, Long>> {
+            return files.map { getPdfInfo(it) }
+        }
 
-    fun getPdfPageCount(pdfFile: File): Int {
-        val parcelFileDescriptor = ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
-        val pdfRenderer = PdfRenderer(parcelFileDescriptor)
-        val totalPages = pdfRenderer.pageCount
-        pdfRenderer.close()
-        return totalPages
+        fun getPdfPageCount(pdfFile: File): Int {
+            val parcelFileDescriptor =
+                ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
+            val pdfRenderer = PdfRenderer(parcelFileDescriptor)
+            val totalPages = pdfRenderer.pageCount
+            pdfRenderer.close()
+            return totalPages
+        }
     }
 }
