@@ -1,9 +1,10 @@
 package com.sorykhan.libroread.adapter
 
+import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,13 +14,10 @@ import com.sorykhan.libroread.databinding.BookListItemBinding
 import com.sorykhan.libroread.utils.FormatUtils
 import com.sorykhan.libroread.utils.getStringMemoryFormat
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 private const val TAG = "BookAdapter"
 
-class BookAdapter(val viewModel: AllBooksViewModel, private val onItemClicked: (Book) -> Unit): ListAdapter<Book, BookAdapter.ItemViewHolder>(DiffCallback) {
+class BookAdapter(private val viewModel: AllBooksViewModel, private val context: Context, private val onItemClicked: (Book) -> Unit): ListAdapter<Book, BookAdapter.ItemViewHolder>(DiffCallback) {
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Book>() {
             override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean {
@@ -37,11 +35,11 @@ class BookAdapter(val viewModel: AllBooksViewModel, private val onItemClicked: (
         fun bind(book: Book) {
             Log.i(TAG, "Binding the book $book")
             binding.bookTitle.text = book.bookName
-            binding.bookSize.text = getStringMemoryFormat(book.bookSize)
-            binding.progressView.text = FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages)
+            binding.bookSize.text = context.getString(R.string.size_s, getStringMemoryFormat(book.bookSize))
+            binding.progressView.text = context.getString(R.string.progress_s, FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages))
             binding.favoriteButton.setImageResource(getFavoriteImageResource(book.isFavorite))
             binding.favoriteButton.setOnClickListener {
-                Log.d(TAG, "Before updating favorite button")
+//                Log.d(TAG, "Before updating favorite button")
                 viewModel.updateIsFavorite(book.bookPath)
                 Log.d(TAG, "After updating")
             }
@@ -69,7 +67,6 @@ class BookAdapter(val viewModel: AllBooksViewModel, private val onItemClicked: (
             val position = viewHolder.adapterPosition
             onItemClicked(getItem(position))
         }
-
         return viewHolder
     }
 

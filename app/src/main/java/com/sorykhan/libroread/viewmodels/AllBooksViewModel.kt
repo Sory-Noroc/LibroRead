@@ -15,7 +15,6 @@ private const val TAG = "AllBooksViewModel"
 class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 
     fun uploadToDatabase() {
-//        val downloads = PdfUtils.getDownloadsFiles(context)
         val downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
         Log.i(TAG, "Downloads path: $downloadsPath")
         for (pdf in PdfUtils.getPDFs(downloadsPath)) {
@@ -39,20 +38,9 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
     private suspend fun insertBook(file: File) {  // Should be called before the UI is even built
         val (name, path, size) = PdfUtils.getPdfInfo(file)
         val pageCount: Int = PdfUtils.getPdfPageCount(file) ?: 0
-        val book = Book(
-            bookName=name,
-            bookPath=path,
-            bookPages = pageCount,
-            bookSize=size
-        )
+        val book = Book(bookName=name, bookPath=path, bookPages = pageCount, bookSize=size)
         bookDao.insertBook(book)
         Log.d(TAG, "Book: $book")
-    }
-
-    fun updateProgress(path: String, progress: Int) {
-        viewModelScope.launch {
-            bookDao.updateProgress(path, progress)
-        }
     }
 
     fun updateIsFavorite(path: String) {

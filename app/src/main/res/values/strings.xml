@@ -12,4 +12,6 @@
     <string name="menu_started_books">Started Books</string>
     <string name="cover_of_the_book">The cover of the book</string>
     <string name="heart_icon">Heart Icon</string>
+    <string name="progress_s" formatted="true">Progress: %1$s</string>
+    <string name="size_s" formatted="true">Size: %1$s</string>
 </resources>

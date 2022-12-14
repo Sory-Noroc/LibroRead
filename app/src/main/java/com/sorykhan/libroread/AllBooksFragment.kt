@@ -51,8 +51,9 @@ class AllBooksFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         Log.i(TAG, "Linked layout to recyclerView")
 
-        val bookAdapter = BookAdapter(viewModel) {
-            TODO("When item clicked, go to activity of reading this book")
+        val bookAdapter = BookAdapter(viewModel, requireContext()) {
+            Log.i(TAG, "Book item clicked")
+            // TODO("When item clicked, go to activity of reading this book")
         }
         recyclerView.adapter = bookAdapter
         Log.i(TAG, "Linked adapter to it's recyclerView")
