@@ -1,5 +1,7 @@
 package com.sorykhan.libroread
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,12 +12,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.artifex.mupdf.viewer.DocumentActivity
 import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 private const val TAG = "AllBooksFragment"
@@ -53,7 +57,12 @@ class AllBooksFragment : Fragment() {
 
         val bookAdapter = BookAdapter(viewModel, requireContext()) {
             Log.i(TAG, "Book item clicked")
-            // TODO("When item clicked, go to activity of reading this book")
+            val file = File(it.bookPath)
+            val documentUri: Uri = Uri.fromFile(file)
+            val intent = Intent(context, DocumentActivity::class.java)
+            intent.action = Intent.ACTION_VIEW
+            intent.data = documentUri
+            startActivity(intent)
         }
         recyclerView.adapter = bookAdapter
         Log.i(TAG, "Linked adapter to it's recyclerView")

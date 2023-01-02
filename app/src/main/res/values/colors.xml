@@ -9,4 +9,9 @@
     <color name="green">#7c921b</color>
     <color name="green_light">#aec24e</color>
     <color name="green_dark">#4c6400</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
 </resources>
