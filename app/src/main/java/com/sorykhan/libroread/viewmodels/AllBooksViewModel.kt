@@ -31,7 +31,7 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
     // Keeping them as functions instead of variables to preserve space
     fun getAllBooks() = bookDao.getAll()
 //    fun getStartedBooks() = bookDao.getStartedBooks()
-//    fun getFavoriteBooks() = bookDao.getFavoriteBooks()
+    fun getFavoriteBooks() = bookDao.getFavoriteBooks()
 //    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
 //    suspend fun deleteBook(book: Book) = bookDao.deleteBook(book)
 
