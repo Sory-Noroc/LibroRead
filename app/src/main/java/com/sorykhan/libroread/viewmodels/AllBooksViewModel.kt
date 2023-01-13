@@ -33,7 +33,11 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 //    fun getStartedBooks() = bookDao.getStartedBooks()
     fun getFavoriteBooks() = bookDao.getFavoriteBooks()
 //    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
-//    suspend fun deleteBook(book: Book) = bookDao.deleteBook(book)
+    fun deleteBook(book: Book) {
+        viewModelScope.launch {
+            bookDao.deleteBook(book)
+        }
+    }
 
     private suspend fun insertBook(file: File) {  // Should be called before the UI is even built
         val (name, path, size) = PdfUtils.getPdfInfo(file)

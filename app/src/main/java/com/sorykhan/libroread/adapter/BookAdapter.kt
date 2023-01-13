@@ -1,7 +1,6 @@
 package com.sorykhan.libroread.adapter
 
 import android.content.Context
-import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import com.sorykhan.libroread.databinding.BookListItemBinding
 import com.sorykhan.libroread.utils.FormatUtils
 import com.sorykhan.libroread.utils.getStringMemoryFormat
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
+import java.io.File
 
 private const val TAG = "BookAdapter"
 
@@ -30,7 +30,7 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
         }
     }
 
-    inner class ItemViewHolder(private var binding: BookListItemBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class ItemViewHolder(var binding: BookListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(book: Book) {
             Log.i(TAG, "Binding the book $book")
@@ -39,9 +39,15 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
             binding.progressView.text = context.getString(R.string.progress_s, FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages))
             binding.favoriteButton.setImageResource(getFavoriteImageResource(book.isFavorite))
             binding.favoriteButton.setOnClickListener {
-//                Log.d(TAG, "Before updating favorite button")
+                Log.d(TAG, "Before updating favorite button")
                 viewModel.updateIsFavorite(book.bookPath)
                 Log.d(TAG, "After updating")
+            }
+            binding.deleteButton.setOnClickListener {
+                val file = File(book.bookPath)
+                file.delete()
+                viewModel.deleteBook(book)
+                Log.i(TAG, "Deleted book ${book.bookPath}")
             }
         }
     }
@@ -67,10 +73,15 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
             val position = viewHolder.adapterPosition
             onItemClicked(getItem(position))
         }
+        viewHolder.itemView
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        holder.binding.favoriteButton.setOnClickListener(null)
+        holder.binding.deleteButton.setOnClickListener(null)
+        holder.binding.favoriteButton.setImageDrawable(null)
+
         holder.bind(getItem(position))
         Log.i(TAG, "Binding the viewHolder")
     }
