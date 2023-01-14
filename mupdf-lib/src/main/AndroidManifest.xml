@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		package="com.artifex.mupdf.mini">
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<application>
+		<activity android:name=".DocumentActivity"
+				android:label="MuPDF mini"
+				android:configChanges="orientation|screenSize|keyboardHidden"
+				android:hardwareAccelerated="false"
+				android:exported="true"
+				>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<!-- list the mime-types we know about -->
+				<data android:mimeType="application/pdf" />
+				<data android:mimeType="application/vnd.ms-xpsdocument" />
+				<data android:mimeType="application/oxps" />
+				<data android:mimeType="application/vnd.comicbook+zip" />
+				<data android:mimeType="application/x-cbz" />
+				<data android:mimeType="application/epub+zip" />
+				<data android:mimeType="application/x-fictionbook" />
+				<!-- list application/octet-stream to catch the ones android doesn't recognize -->
+				<data android:mimeType="application/octet-stream" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".OutlineActivity"
+				android:configChanges="orientation|screenSize|keyboardHidden"
+				>
+		</activity>
+	</application>
+</manifest>

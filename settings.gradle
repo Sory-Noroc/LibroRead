@@ -19,3 +19,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "LibroRead"
 include ':app'
+include ':mupdf-lib'
