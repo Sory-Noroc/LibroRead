@@ -1,9 +1,6 @@
 package com.sorykhan.libroread
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +10,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.artifex.mupdf.viewer.DocumentActivity
 import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
@@ -21,7 +17,6 @@ import com.sorykhan.libroread.utils.startBookActivity
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 private const val TAG = "AllBooksFragment"
