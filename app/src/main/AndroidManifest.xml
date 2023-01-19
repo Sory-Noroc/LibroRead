@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.artifex.mupdf.viewer.DocumentActivity"
+        <activity android:name="com.artifex.mupdf.mini.DocumentActivity"
             android:exported="true">
         </activity>
 

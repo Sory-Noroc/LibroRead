@@ -106,48 +106,6 @@ public class DocumentActivity extends Activity
 		return builder.toString();
 	}
 
-	private void openInput(Uri uri, long size, String mimetype) throws IOException {
-		ContentResolver cr = getContentResolver();
-
-		Log.i(APP, "Opening document " + uri);
-
-		InputStream is = cr.openInputStream(uri);
-		byte[] buf = null;
-		int used = -1;
-		try {
-			final int limit = 8 * 1024 * 1024;
-			if (size < 0) { // size is unknown
-				buf = new byte[limit];
-				used = is.read(buf);
-				boolean atEOF = is.read() == -1;
-				if (used < 0 || (used == limit && !atEOF)) // no or partial data
-					buf = null;
-			} else if (size <= limit) { // size is known and below limit
-				buf = new byte[(int) size];
-				used = is.read(buf);
-				if (used < 0 || used < size) // no or partial data
-					buf = null;
-			}
-			if (buf != null && buf.length != used) {
-				byte[] newbuf = new byte[used];
-				System.arraycopy(buf, 0, newbuf, 0, used);
-				buf = newbuf;
-			}
-		} catch (OutOfMemoryError e) {
-			buf = null;
-		} finally {
-			is.close();
-		}
-
-		if (buf != null) {
-			Log.i(APP, "  Opening document from memory buffer of size " + buf.length);
-			buffer = buf;
-		} else {
-			Log.i(APP, "  Opening document from stream");
-			stream = new ContentInputStream(cr, uri, size);
-		}
-	}
-
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -241,11 +199,11 @@ public class DocumentActivity extends Activity
 		searchHitPage = -1;
 		hasLoaded = false;
 
-		pageView = (PageView)findViewById(R.id.page_view);
+		pageView = findViewById(R.id.page_view);
 		pageView.setActionListener(this);
 
-		pageLabel = (TextView)findViewById(R.id.page_label);
-		pageSeekbar = (SeekBar)findViewById(R.id.page_seekbar);
+		pageLabel = findViewById(R.id.page_label);
+		pageSeekbar = findViewById(R.id.page_seekbar);
 		pageSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public int newProgress = -1;
 			public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
@@ -261,24 +219,18 @@ public class DocumentActivity extends Activity
 		});
 
 		searchButton = findViewById(R.id.search_button);
-		searchButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showSearch();
-			}
-		});
+		searchButton.setOnClickListener(v -> showSearch());
 		searchText = (EditText)findViewById(R.id.search_text);
-		searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
-					search(1);
-					return true;
-				}
-				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-					search(1);
-					return true;
-				}
-				return false;
+		searchText.setOnEditorActionListener((v, actionId, event) -> {
+			if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
+				search(1);
+				return true;
 			}
+			if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+				search(1);
+				return true;
+			}
+			return false;
 		});
 		searchText.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {}
@@ -288,72 +240,50 @@ public class DocumentActivity extends Activity
 			}
 		});
 		searchCloseButton = findViewById(R.id.search_close_button);
-		searchCloseButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				hideSearch();
-			}
-		});
+		searchCloseButton.setOnClickListener(v -> hideSearch());
 		searchBackwardButton = findViewById(R.id.search_backward_button);
-		searchBackwardButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(-1);
-			}
-		});
+		searchBackwardButton.setOnClickListener(v -> search(-1));
 		searchForwardButton = findViewById(R.id.search_forward_button);
-		searchForwardButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(1);
-			}
-		});
+		searchForwardButton.setOnClickListener(v -> search(1));
 
 		outlineButton = findViewById(R.id.outline_button);
-		outlineButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(DocumentActivity.this, OutlineActivity.class);
-				Bundle bundle = new Bundle();
-				bundle.putInt("POSITION", currentPage);
-				bundle.putSerializable("OUTLINE", flatOutline);
-				intent.putExtras(bundle);
-				startActivityForResult(intent, NAVIGATE_REQUEST);
-			}
+		outlineButton.setOnClickListener(v -> {
+			Intent intent = new Intent(DocumentActivity.this, OutlineActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putInt("POSITION", currentPage);
+			bundle.putSerializable("OUTLINE", flatOutline);
+			intent.putExtras(bundle);
+			startActivityForResult(intent, NAVIGATE_REQUEST);
 		});
 
 		zoomButton = findViewById(R.id.zoom_button);
-		zoomButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				fitPage = !fitPage;
-				loadPage();
-			}
+		zoomButton.setOnClickListener(v -> {
+			fitPage = !fitPage;
+			loadPage();
 		});
 
 		layoutButton = findViewById(R.id.layout_button);
 		layoutPopupMenu = new PopupMenu(this, layoutButton);
 		layoutPopupMenu.getMenuInflater().inflate(R.menu.layout_menu, layoutPopupMenu.getMenu());
-		layoutPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-			public boolean onMenuItemClick(MenuItem item) {
-				float oldLayoutEm = layoutEm;
-				int id = item.getItemId();
-				if (id == R.id.action_layout_6pt) layoutEm = 6;
-				else if (id == R.id.action_layout_7pt) layoutEm = 7;
-				else if (id == R.id.action_layout_8pt) layoutEm = 8;
-				else if (id == R.id.action_layout_9pt) layoutEm = 9;
-				else if (id == R.id.action_layout_10pt) layoutEm = 10;
-				else if (id == R.id.action_layout_11pt) layoutEm = 11;
-				else if (id == R.id.action_layout_12pt) layoutEm = 12;
-				else if (id == R.id.action_layout_13pt) layoutEm = 13;
-				else if (id == R.id.action_layout_14pt) layoutEm = 14;
-				else if (id == R.id.action_layout_15pt) layoutEm = 15;
-				else if (id == R.id.action_layout_16pt) layoutEm = 16;
-				if (oldLayoutEm != layoutEm)
-					relayoutDocument();
-				return true;
-			}
+		layoutPopupMenu.setOnMenuItemClickListener(item -> {
+			float oldLayoutEm = layoutEm;
+			int id = item.getItemId();
+			if (id == R.id.action_layout_6pt) layoutEm = 6;
+			else if (id == R.id.action_layout_7pt) layoutEm = 7;
+			else if (id == R.id.action_layout_8pt) layoutEm = 8;
+			else if (id == R.id.action_layout_9pt) layoutEm = 9;
+			else if (id == R.id.action_layout_10pt) layoutEm = 10;
+			else if (id == R.id.action_layout_11pt) layoutEm = 11;
+			else if (id == R.id.action_layout_12pt) layoutEm = 12;
+			else if (id == R.id.action_layout_13pt) layoutEm = 13;
+			else if (id == R.id.action_layout_14pt) layoutEm = 14;
+			else if (id == R.id.action_layout_15pt) layoutEm = 15;
+			else if (id == R.id.action_layout_16pt) layoutEm = 16;
+			if (oldLayoutEm != layoutEm)
+				relayoutDocument();
+			return true;
 		});
-		layoutButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				layoutPopupMenu.show();
-			}
-		});
+		layoutButton.setOnClickListener(v -> layoutPopupMenu.show());
 	}
 
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -401,6 +331,48 @@ public class DocumentActivity extends Activity
 		if (zoom != pageZoom) {
 			pageZoom = zoom;
 			loadPage();
+		}
+	}
+
+	private void openInput(Uri uri, long size, String mimetype) throws IOException {
+		ContentResolver cr = getContentResolver();
+
+		Log.i(APP, "Opening document " + uri);
+
+		InputStream is = cr.openInputStream(uri);
+		byte[] buf = null;
+		int used = -1;
+		try {
+			final int limit = 8 * 1024 * 1024;
+			if (size < 0) { // size is unknown
+				buf = new byte[limit];
+				used = is.read(buf);
+				boolean atEOF = is.read() == -1;
+				if (used < 0 || (used == limit && !atEOF)) // no or partial data
+					buf = null;
+			} else if (size <= limit) { // size is known and below limit
+				buf = new byte[(int) size];
+				used = is.read(buf);
+				if (used < 0 || used < size) // no or partial data
+					buf = null;
+			}
+			if (buf != null && buf.length != used) {
+				byte[] newbuf = new byte[used];
+				System.arraycopy(buf, 0, newbuf, 0, used);
+				buf = newbuf;
+			}
+		} catch (OutOfMemoryError e) {
+			buf = null;
+		} finally {
+			is.close();
+		}
+
+		if (buf != null) {
+			Log.i(APP, "  Opening document from memory buffer of size " + buf.length);
+			buffer = buf;
+		} else {
+			Log.i(APP, "  Opening document from stream");
+			stream = new ContentInputStream(cr, uri, size);
 		}
 	}
 
@@ -773,9 +745,6 @@ public class DocumentActivity extends Activity
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET); // FLAG_ACTIVITY_NEW_DOCUMENT in API>=21
 		try {
 			startActivity(intent);
-		} catch (FileUriExposedException x) {
-			Log.e(APP, x.toString());
-			Toast.makeText(DocumentActivity.this, "Android does not allow following file:// link: " + uri, Toast.LENGTH_LONG).show();
 		} catch (Throwable x) {
 			Log.e(APP, x.getMessage());
 			Toast.makeText(DocumentActivity.this, x.getMessage(), Toast.LENGTH_SHORT).show();
