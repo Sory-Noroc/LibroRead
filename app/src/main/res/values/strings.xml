@@ -15,4 +15,10 @@
     <string name="progress_s" formatted="true">Progress: %1$s</string>
     <string name="size_s" formatted="true">Size: %1$s</string>
     <string name="libroread">LibroRead</string>
+
+    <string name="dlog_password_title">Password:</string>
+    <string name="dlog_password_message">The document is encrypted.</string>
+    <string name="dlog_password_retry">Invalid password.</string>
+    <string name="text_search_hint">Search&#x2026;</string>
+    <string name="toast_search_not_found">Search not found.</string>
 </resources>

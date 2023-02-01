@@ -1,6 +1,4 @@
-package com.artifex.mupdf.mini;
-
-import com.artifex.mupdf.fitz.*;
+package com.sorykhan.libroread.external;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,6 +11,10 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Scroller;
+
+import com.artifex.mupdf.fitz.Link;
+import com.artifex.mupdf.fitz.Quad;
+import com.artifex.mupdf.fitz.Rect;
 
 public class PageView extends View implements
 	GestureDetector.OnGestureListener,

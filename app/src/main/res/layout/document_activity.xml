@@ -4,7 +4,7 @@
 		android:layout_height="match_parent"
 		android:keepScreenOn="true"
 		>
-	<com.artifex.mupdf.mini.PageView android:id="@+id/page_view"
+	<com.sorykhan.libroread.external.PageView android:id="@+id/page_view"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:background="#505050"

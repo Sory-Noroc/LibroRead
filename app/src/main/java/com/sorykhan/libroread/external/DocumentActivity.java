@@ -1,9 +1,5 @@
-package com.artifex.mupdf.mini;
+package com.sorykhan.libroread.external;
 
-import com.artifex.mupdf.fitz.*;
-import com.artifex.mupdf.fitz.android.*;
-
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -11,13 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileUriExposedException;
-import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,7 +18,6 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,10 +29,19 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.room.Room;
 
-import java.io.FileNotFoundException;
+import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Link;
+import com.artifex.mupdf.fitz.Matrix;
+import com.artifex.mupdf.fitz.Outline;
+import com.artifex.mupdf.fitz.Page;
+import com.artifex.mupdf.fitz.Quad;
+import com.artifex.mupdf.fitz.SeekableInputStream;
+import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
+import com.sorykhan.libroread.R;
+import com.sorykhan.libroread.database.BookRoomDatabase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -110,6 +111,10 @@ public class DocumentActivity extends Activity
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		BookRoomDatabase db = Room.databaseBuilder(getApplicationContext(),
+						BookRoomDatabase.class, "my_database.db")
+				.build();
 
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
