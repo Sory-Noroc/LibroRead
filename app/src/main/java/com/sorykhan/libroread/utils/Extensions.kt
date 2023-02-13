@@ -13,5 +13,6 @@ fun Fragment.startBookActivity(book: Book) {
     val intent = Intent(context, DocumentActivity::class.java)
     intent.action = Intent.ACTION_VIEW
     intent.data = documentUri
+    intent.putExtra("path", book.bookPath)
     startActivity(intent)
 }

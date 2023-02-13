@@ -53,6 +53,12 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
             bookDao.updateIsFavorite(path, !isFavorite)
         }
     }
+
+    fun updateProgress(path: String, progress: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            bookDao.updateProgress(path, progress)
+        }
+    }
 }
 
 class BookListViewModelFactory(private val bookDao: BookDao): ViewModelProvider.Factory {

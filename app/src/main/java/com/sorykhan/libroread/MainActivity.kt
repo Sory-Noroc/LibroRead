@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private val viewModel: AllBooksViewModel by viewModels {
+    val viewModel: AllBooksViewModel by viewModels {
         BookListViewModelFactory(
             (application as BookApplication).database
                 .bookDao()

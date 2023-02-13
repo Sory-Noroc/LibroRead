@@ -10,7 +10,7 @@
 			android:background="#505050"
 			android:keepScreenOn="true"
 			/>
-	<LinearLayout android:id="@+id/action_bar"
+	<androidx.appcompat.widget.Toolbar android:id="@+id/action_bar"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"
 			android:layout_alignParentTop="true"
@@ -59,9 +59,9 @@
 				android:layout_gravity="center"
 				android:background="@drawable/button"
 				android:src="@drawable/ic_toc_white_24dp"
-				android:visibility="gone"
-				/>
-	</LinearLayout>
+				android:visibility="gone"/>
+	</androidx.appcompat.widget.Toolbar>
+
 	<LinearLayout android:id="@+id/search_bar"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"

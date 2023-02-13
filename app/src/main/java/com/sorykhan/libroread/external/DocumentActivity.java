@@ -29,7 +29,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.room.Room;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Link;
@@ -40,14 +42,16 @@ import com.artifex.mupdf.fitz.Quad;
 import com.artifex.mupdf.fitz.SeekableInputStream;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 import com.sorykhan.libroread.R;
-import com.sorykhan.libroread.database.BookRoomDatabase;
+import com.sorykhan.libroread.database.BookApplication;
+import com.sorykhan.libroread.viewmodels.AllBooksViewModel;
+import com.sorykhan.libroread.viewmodels.BookListViewModelFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class DocumentActivity extends Activity
+public class DocumentActivity extends AppCompatActivity
 {
 	private final String APP = "MuPDF";
 
@@ -100,6 +104,10 @@ public class DocumentActivity extends Activity
 	protected Stack<Integer> history;
 	protected boolean wentBack;
 
+	private String path;
+
+	private AllBooksViewModel viewModel;
+
 	private String toHex(byte[] digest) {
 		StringBuilder builder = new StringBuilder(2 * digest.length);
 		for (byte b : digest)
@@ -111,11 +119,6 @@ public class DocumentActivity extends Activity
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		BookRoomDatabase db = Room.databaseBuilder(getApplicationContext(),
-						BookRoomDatabase.class, "my_database.db")
-				.build();
-
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		displayDPI = metrics.densityDpi;
@@ -127,8 +130,12 @@ public class DocumentActivity extends Activity
 
 		currentBar = actionBar;
 
+		viewModel = new ViewModelProvider(this, new BookListViewModelFactory(((BookApplication) getApplication()).getDatabase().bookDao())).get(AllBooksViewModel.class);
+
 		Uri uri = getIntent().getData();
 		mimetype = getIntent().getType();
+
+		path = getIntent().getStringExtra("path");
 
 		if (uri == null) {
 			Toast.makeText(this, "No document uri to open", Toast.LENGTH_SHORT).show();
@@ -467,6 +474,7 @@ public class DocumentActivity extends Activity
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {
+		super.onActivityResult(request, result, data);
 		if (request == NAVIGATE_REQUEST && result >= RESULT_FIRST_USER)
 			gotoPage(result - RESULT_FIRST_USER);
 	}
@@ -722,6 +730,7 @@ public class DocumentActivity extends Activity
 		if (currentPage > 0) {
 			wentBack = true;
 			currentPage --;
+			viewModel.updateProgress(path, currentPage);
 			loadPage();
 		}
 	}
@@ -729,6 +738,7 @@ public class DocumentActivity extends Activity
 	public void goForward() {
 		if (currentPage < pageCount - 1) {
 			currentPage ++;
+			viewModel.updateProgress(path, currentPage);
 			loadPage();
 		}
 	}
