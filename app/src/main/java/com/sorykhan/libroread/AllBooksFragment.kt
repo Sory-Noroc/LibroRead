@@ -1,10 +1,16 @@
 package com.sorykhan.libroread
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
@@ -13,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentAllBooksBinding
+import com.sorykhan.libroread.external.DocumentActivity
+import com.sorykhan.libroread.utils.PdfUtils
 import com.sorykhan.libroread.utils.startBookActivity
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
@@ -54,6 +62,13 @@ class AllBooksFragment : Fragment() {
 
         val bookAdapter = BookAdapter(viewModel, requireContext()) {
             Log.i(TAG, "Book item clicked")
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (PdfUtils.hasAllFilesPermission()) {
+                    startBookActivity(it)
+                } else {
+                    PdfUtils.requestFilePermission(requireContext())
+                }
+            }
             startBookActivity(it)
         }
         recyclerView.adapter = bookAdapter

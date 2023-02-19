@@ -1,5 +1,6 @@
 package com.sorykhan.libroread.external;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -30,6 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
@@ -46,6 +50,7 @@ import com.sorykhan.libroread.database.BookApplication;
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel;
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,7 +59,6 @@ import java.util.Stack;
 public class DocumentActivity extends AppCompatActivity
 {
 	private final String APP = "MuPDF";
-
 	public final int NAVIGATE_REQUEST = 1;
 
 	protected Worker worker;
@@ -296,6 +300,13 @@ public class DocumentActivity extends AppCompatActivity
 			return true;
 		});
 		layoutButton.setOnClickListener(v -> layoutPopupMenu.show());
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		onBackPressed();
 	}
 
 	public boolean onKeyUp(int keyCode, KeyEvent event) {

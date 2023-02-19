@@ -20,7 +20,7 @@ class PdfUtils {
         const val downloadsPath = "/storage/emulated/0/Download/"
 
         @RequiresApi(Build.VERSION_CODES.R)
-        private fun hasAllFilesPermission() = Environment.isExternalStorageManager()
+        fun hasAllFilesPermission() = Environment.isExternalStorageManager()
 
         fun getDownloadsFiles(context: Context): Array<String> {
             /**
@@ -83,15 +83,15 @@ class PdfUtils {
         fun getPdfPageCount(pdfFile: File): Int? {
             val parcelFileDescriptor =
                 ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
-            val pdfRenderer = PdfRenderer(parcelFileDescriptor)
+            var pdfRenderer: PdfRenderer? = null
             try {
-                return pdfRenderer.pageCount
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception in trying to get page count: $e")
-            } finally {
-                pdfRenderer.close()
+                pdfRenderer = PdfRenderer(parcelFileDescriptor)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "$e")
             }
-            return null
+            val pageCount = pdfRenderer?.pageCount
+            pdfRenderer?.close()
+            return pageCount
         }
     }
 }
