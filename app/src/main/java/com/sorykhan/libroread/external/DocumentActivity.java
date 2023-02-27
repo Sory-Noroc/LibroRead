@@ -479,8 +479,10 @@ public class DocumentActivity extends AppCompatActivity
 				startActivity(intent);
 			}
 		} else {
-			currentPage = history.pop();
-			loadPage();
+//			currentPage = history.pop();
+//			loadPage();
+			history.clear();
+			super.onBackPressed();
 		}
 	}
 
@@ -741,7 +743,7 @@ public class DocumentActivity extends AppCompatActivity
 		if (currentPage > 0) {
 			wentBack = true;
 			currentPage --;
-			viewModel.updateProgress(path, currentPage);
+			viewModel.updateProgress(path, currentPage+1);
 			loadPage();
 		}
 	}
@@ -749,7 +751,7 @@ public class DocumentActivity extends AppCompatActivity
 	public void goForward() {
 		if (currentPage < pageCount - 1) {
 			currentPage ++;
-			viewModel.updateProgress(path, currentPage);
+			viewModel.updateProgress(path, currentPage+1);
 			loadPage();
 		}
 	}
@@ -758,6 +760,7 @@ public class DocumentActivity extends AppCompatActivity
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			history.push(currentPage);
 			currentPage = p;
+			viewModel.updateProgress(path, currentPage+1);
 			loadPage();
 		}
 	}
