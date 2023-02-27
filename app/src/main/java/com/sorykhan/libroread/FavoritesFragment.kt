@@ -1,11 +1,13 @@
 package com.sorykhan.libroread
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentFavoritesBinding
+import com.sorykhan.libroread.utils.PdfUtils
 import com.sorykhan.libroread.utils.startBookActivity
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
@@ -54,6 +57,14 @@ class FavoritesFragment : Fragment() {
 
         val bookAdapter = BookAdapter(viewModel, requireContext()) {
             Log.i(TAG, "Book item clicked")
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (PdfUtils.hasAllFilesPermission()) {
+                    startBookActivity(it)
+                } else {
+                    Toast.makeText(requireContext(), "Please give access to all files", Toast.LENGTH_LONG).show()
+                    PdfUtils.requestFilePermission(requireContext())
+                }
+            }
             startBookActivity(it)
         }
 

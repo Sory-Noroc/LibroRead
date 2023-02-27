@@ -26,9 +26,14 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
         val downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
         Log.i(TAG, "Downloads path: $downloadsPath")
         for (pdf in PdfUtils.getPDFs(downloadsPath)) {
+            Log.d(TAG, "Checking pdf $pdf")
             viewModelScope.launch(Dispatchers.IO) {
                 val bookInDbName = bookDao.getBySearch(pdf.name)
                 if (bookInDbName == null) {
+                    val doc = Document.openDocument(pdf.absolutePath, "")
+                    if (doc.needsPassword()) {
+                        Log.w(TAG, "Ignoring pdf file with password")
+                    }
                     Log.i(TAG, "Book not already in DB, have to insert")
                     insertBook(pdf)
                 }
@@ -52,10 +57,12 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 
     private suspend fun insertBook(file: File) {  // Should be called before the UI is even built
         val (name, path, size) = PdfUtils.getPdfInfo(file)
-        val pageCount: Int = PdfUtils.getPdfPageCount(file) ?: 0
-        val book = Book(bookName=name, bookPath=path, bookPages = pageCount, bookSize=size)
-        bookDao.insertBook(book)
-        Log.d(TAG, "Book: $book")
+        val pageCount: Int? = PdfUtils.getPdfPageCount(file)
+        pageCount?.let {
+            val book = Book(bookName = name, bookPath = path, bookPages = pageCount, bookSize = size)
+            bookDao.insertBook(book)
+            Log.d(TAG, "Book: $book")
+        }
     }
 
     fun updateIsFavorite(path: String) {

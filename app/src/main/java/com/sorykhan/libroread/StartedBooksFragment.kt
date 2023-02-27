@@ -1,15 +1,27 @@
 package com.sorykhan.libroread
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.coroutineScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.sorykhan.libroread.adapter.BookAdapter
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.FragmentStartedBooksBinding
+import com.sorykhan.libroread.utils.PdfUtils
+import com.sorykhan.libroread.utils.startBookActivity
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
+import kotlinx.coroutines.launch
+
+private const val TAG = "StartedBooksFragment"
 
 class StartedBooksFragment : Fragment() {
 
@@ -18,7 +30,9 @@ class StartedBooksFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val sharedViewModel: AllBooksViewModel by activityViewModels {
+    private lateinit var recyclerView: RecyclerView
+
+    private val viewModel: AllBooksViewModel by activityViewModels {
         BookListViewModelFactory(
             (activity?.application as BookApplication).database
                 .bookDao()
@@ -30,17 +44,38 @@ class StartedBooksFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val slideshowViewModel =
-//            ViewModelProvider(this).get(StartedBooksViewModel::class.java)
-
         _binding = FragmentStartedBooksBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        Log.i(TAG, "Creating views in fragment")
+        return binding.root
+    }
 
-//        val textView: TextView = binding.textSlideshow
-//        slideshowViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-        return root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recyclerView = binding.startedRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val bookAdapter = BookAdapter(viewModel, requireContext()) {
+            Log.i(TAG, "Book item clicked")
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (PdfUtils.hasAllFilesPermission()) {
+                    startBookActivity(it)
+                } else {
+                    Toast.makeText(requireContext(), "Please give access to all files", Toast.LENGTH_LONG).show()
+                    PdfUtils.requestFilePermission(requireContext())
+                }
+            }
+            startBookActivity(it)
+        }
+
+        recyclerView.adapter = bookAdapter
+        Log.i(TAG, "Linked adapter to recyclerView")
+
+        lifecycle.coroutineScope.launch {
+            viewModel.getStartedBooks().collect {
+                bookAdapter.submitList(it)
+                Log.i(TAG, "Extracted the started books from the DB and sent them to the adapter")
+            }
+        }
     }
 
     override fun onDestroyView() {

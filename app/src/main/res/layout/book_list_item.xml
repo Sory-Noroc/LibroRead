@@ -5,7 +5,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:layout_margin="10dp">
 
         <ImageView
             android:id="@+id/book_image"
@@ -23,6 +24,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/favorite_button"
             app:layout_constraintStart_toEndOf="@+id/book_image"
