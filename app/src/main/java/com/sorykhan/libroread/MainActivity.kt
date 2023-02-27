@@ -1,14 +1,12 @@
 package com.sorykhan.libroread
 
-import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -17,14 +15,10 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookApplication
 import com.sorykhan.libroread.databinding.ActivityMainBinding
-import com.sorykhan.libroread.utils.PdfUtils
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import com.sorykhan.libroread.viewmodels.BookListViewModelFactory
-import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 
@@ -33,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    val viewModel: AllBooksViewModel by viewModels {
+    private val viewModel: AllBooksViewModel by viewModels {
         BookListViewModelFactory(
             (application as BookApplication).database
                 .bookDao()
@@ -44,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel.uploadToDatabase()
+
+        observeAllBooks()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -69,6 +65,31 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    private fun observeAllBooks() {
+        viewModel.allBooks.observe(this) {
+            val bitmapsHashMap = mutableMapOf<String, Bitmap?>()
+            viewModel.allBooks.observe(this) { books ->
+                // Generate the bitmap for the current PDF path
+                var changes = 0
+                for (book in books) {
+                    if (viewModel.coverMap.value?.containsKey(book.bookPath) != true) {
+                        // If the cover was not added yet
+                        val bitmap = viewModel.getBookCover(this, book.bookPath)
+
+                        // Add the bitmap to the list
+                        bitmapsHashMap[book.bookPath] = bitmap
+                        changes = 1
+                        Log.i(TAG, "Adding new entry to bookCovers map")
+                    }
+                }
+                if (changes == 1) {
+                    // Update the LiveData with the new list of bitmaps
+                    viewModel.coverMap.value = bitmapsHashMap
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

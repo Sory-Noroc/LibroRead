@@ -1,10 +1,6 @@
 package com.sorykhan.libroread.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.pdf.PdfRenderer
-import android.nfc.Tag
-import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -18,7 +14,6 @@ import com.sorykhan.libroread.utils.FormatUtils
 import com.sorykhan.libroread.utils.getStringMemoryFormat
 import com.sorykhan.libroread.viewmodels.AllBooksViewModel
 import java.io.File
-import java.io.FileNotFoundException
 
 private const val TAG = "BookAdapter"
 
@@ -38,51 +33,44 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
     inner class ItemViewHolder(var binding: BookListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(book: Book) {
+            // position is needed to get the right book cover from the list
             Log.i(TAG, "Binding the book $book")
             if (!File(book.bookPath).exists()) {
                 viewModel.deleteBook(book)
             }
-            binding.bookImage.setImageBitmap(getBookCover(book.bookPath))
+
+            // Check if book cover in in map and if not extract it again from the pdf file
+            if (viewModel.coverMap.value?.keys?.contains(book.bookPath) == true) {
+                // Api too low to use getOrDefault
+                binding.bookImage.setImageBitmap(viewModel.coverMap.value!![book.bookPath])
+            } else {
+                binding.bookImage.setImageBitmap(viewModel.getBookCover(context, book.bookPath))
+            }
+
+            // Binding all the views
             binding.bookTitle.text = book.bookName
+
             binding.bookSize.text = context.getString(R.string.size_s, getStringMemoryFormat(book.bookSize))
-            binding.progressView.text = context.getString(R.string.progress_s, FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages))
+
+            binding.progressView.text = context.getString(
+                R.string.progress_s,
+                FormatUtils.getProgressPercentage(book.bookProgress, book.bookPages)
+            )
+
             binding.favoriteButton.setImageResource(getFavoriteImageResource(book.isFavorite))
             binding.favoriteButton.setOnClickListener {
                 Log.d(TAG, "Before updating favorite button")
                 viewModel.updateIsFavorite(book.bookPath)
                 Log.d(TAG, "After updating")
             }
+
             binding.deleteButton.setOnClickListener {
                 val file = File(book.bookPath)
                 file.delete()
                 viewModel.deleteBook(book)
                 Log.i(TAG, "Deleted book ${book.bookPath}")
             }
-        }
-
-        private fun getBookCover(pdfPath: String): Bitmap? {
-            val file = File(pdfPath)
-            var page:PdfRenderer.Page? = null
-            var pdfRenderer: PdfRenderer? = null
-            try {
-                val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-                pdfRenderer = PdfRenderer(fileDescriptor)
-                page = pdfRenderer.openPage(0)
-                val density = context.resources.displayMetrics.density
-                val desiredWidth = (30 * density).toInt()
-                val desiredHeight = (45 * density).toInt()
-                val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true)
-                page.render(scaledBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                return scaledBitmap
-            } catch (e: FileNotFoundException) {
-                Log.e(TAG, "Wrong path/file $e")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error when rendering book cover: $e")
-                page?.close()
-                pdfRenderer?.close()
-            }
-            return null
+            binding.executePendingBindings()
         }
     }
 
@@ -115,7 +103,6 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
         holder.binding.favoriteButton.setOnClickListener(null)
         holder.binding.deleteButton.setOnClickListener(null)
         holder.binding.favoriteButton.setImageDrawable(null)
-
         holder.bind(getItem(position))
         Log.i(TAG, "Binding the viewHolder")
     }

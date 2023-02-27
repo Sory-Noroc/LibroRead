@@ -1,18 +1,26 @@
 package com.sorykhan.libroread.viewmodels
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.os.Environment
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.lifecycle.*
+import com.artifex.mupdf.fitz.Document
 import com.sorykhan.libroread.database.Book
 import com.sorykhan.libroread.database.BookDao
 import com.sorykhan.libroread.utils.PdfUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileNotFoundException
 
 private const val TAG = "AllBooksViewModel"
 
 class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
+
+    var coverMap = MutableLiveData<Map<String, Bitmap?>>()
 
     fun uploadToDatabase() {
         val downloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
@@ -30,8 +38,11 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
 
     // Keeping them as functions instead of variables to preserve space
     fun getAllBooks() = bookDao.getAll()
-//    fun getStartedBooks() = bookDao.getStartedBooks()
+    val allBooks: LiveData<List<Book>> = bookDao.getAll().asLiveData()
+    fun getStartedBooks() = bookDao.getStartedBooks()
+    val startedBooks: LiveData<List<Book>> = bookDao.getStartedBooks().asLiveData()
     fun getFavoriteBooks() = bookDao.getFavoriteBooks()
+    val favoriteBooks: LiveData<List<Book>> = bookDao.getFavoriteBooks().asLiveData()
 //    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
     fun deleteBook(book: Book) {
         viewModelScope.launch {
@@ -58,6 +69,35 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             bookDao.updateProgress(path, progress)
         }
+    }
+
+    fun getBookCover(context: Context, pdfPath: String): Bitmap? {
+
+        val file = File(pdfPath)
+        var page: PdfRenderer.Page? = null
+        var pdfRenderer: PdfRenderer? = null
+
+        try {
+            val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            pdfRenderer = PdfRenderer(fileDescriptor)
+            page = pdfRenderer.openPage(0)
+            val density = context.resources.displayMetrics.density
+            val desiredWidth = (30 * density).toInt()
+            val desiredHeight = (45 * density).toInt()
+            val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true)
+
+            page.render(scaledBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            return scaledBitmap
+
+        } catch (e: FileNotFoundException) {
+            Log.e(TAG, "Wrong path/file $e")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error when rendering book cover: $e")
+            page?.close()
+            pdfRenderer?.close()
+        }
+        return null
     }
 }
 
