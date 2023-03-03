@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -65,10 +66,27 @@ class BookAdapter(private val viewModel: AllBooksViewModel, private val context:
             }
 
             binding.deleteButton.setOnClickListener {
-                val file = File(book.bookPath)
-                file.delete()
-                viewModel.deleteBook(book)
-                Log.i(TAG, "Deleted book ${book.bookPath}")
+                val builder = AlertDialog.Builder(context)
+                builder.setTitle("Delete on device or only in app")
+
+                val options = arrayOf("On device", "In app")
+
+                builder.setItems(options) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val file = File(book.bookPath)
+                            file.delete()
+                            viewModel.deleteBook(book)
+                            Log.i(TAG, "Deleted book on device: ${book.bookPath}")
+                        }
+                        1 -> {
+                            viewModel.deleteBook(book)
+                            Log.i(TAG, "Deleted book in app: ${book.bookPath}")
+                        }
+                    }
+                }
+                val dialog = builder.create()
+                dialog.show()
             }
             binding.executePendingBindings()
         }
