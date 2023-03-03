@@ -89,8 +89,8 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
             pdfRenderer = PdfRenderer(fileDescriptor)
             page = pdfRenderer.openPage(0)
             val density = context.resources.displayMetrics.density
-            val desiredWidth = (30 * density).toInt()
-            val desiredHeight = (45 * density).toInt()
+            val desiredWidth = (60 * density).toInt()
+            val desiredHeight = (90 * density).toInt()
             val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
             val scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true)
 
