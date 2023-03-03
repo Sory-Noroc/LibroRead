@@ -10,6 +10,7 @@
         android:id="@+id/started_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="10dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

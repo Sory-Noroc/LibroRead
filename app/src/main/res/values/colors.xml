@@ -2,7 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
     <color name="indigo">#1a237e</color>
     <color name="indigo_light">#534bae</color>
     <color name="indigo_dark">#000051</color>
@@ -14,4 +13,7 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="recycler_background">#000051</color>
+    <color name="book_background">#FFFFFFFF</color>
 </resources>

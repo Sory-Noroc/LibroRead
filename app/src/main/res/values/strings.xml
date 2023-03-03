@@ -21,4 +21,5 @@
     <string name="dlog_password_retry">Invalid password.</string>
     <string name="text_search_hint">Search&#x2026;</string>
     <string name="toast_search_not_found">Search not found.</string>
+    <string name="refresh">Refresh</string>
 </resources>
