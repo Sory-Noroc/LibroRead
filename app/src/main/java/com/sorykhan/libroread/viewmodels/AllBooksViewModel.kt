@@ -45,10 +45,7 @@ class AllBooksViewModel(private val bookDao: BookDao): ViewModel() {
     fun getAllBooks() = bookDao.getAll()
     val allBooks: LiveData<List<Book>> = bookDao.getAll().asLiveData()
     fun getStartedBooks() = bookDao.getStartedBooks()
-    val startedBooks: LiveData<List<Book>> = bookDao.getStartedBooks().asLiveData()
     fun getFavoriteBooks() = bookDao.getFavoriteBooks()
-    val favoriteBooks: LiveData<List<Book>> = bookDao.getFavoriteBooks().asLiveData()
-//    fun getBooksBySearch(search: String) = bookDao.getBySearch(search)
     fun deleteBook(book: Book) {
         viewModelScope.launch {
             bookDao.deleteBook(book)

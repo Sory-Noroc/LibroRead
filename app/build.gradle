@@ -45,7 +45,7 @@ dependencies {
     def robolectricVersion = "4.9"
 
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
@@ -55,9 +55,9 @@ dependencies {
     implementation "androidx.room:room-runtime:2.5.0"
     implementation 'androidx.navigation:navigation-testing:2.5.3'
     implementation "androidx.room:room-ktx:2.5.0"
-    implementation 'androidx.databinding:viewbinding:7.4.0'
+    implementation 'androidx.databinding:viewbinding:7.4.2'
 
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     if (file('../jni/build.gradle').isFile())
         api project(':jni')
     else
@@ -71,7 +71,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 
     testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
-    testImplementation "androidx.arch.core:core-testing:2.1.0@aar"
+    testImplementation "androidx.arch.core:core-testing:2.2.0@aar"
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     testImplementation('androidx.test:runner:1.5.2')
     testImplementation('androidx.test:rules:1.5.0')

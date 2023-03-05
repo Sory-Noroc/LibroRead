@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_nav_all_books_to_nav_started_books"
             app:destination="@id/nav_started_books" />
+        <action
+            android:id="@+id/action_nav_all_books_to_nav_about"
+            app:destination="@id/nav_about" />
     </fragment>
 
     <fragment
@@ -29,6 +32,9 @@
         <action
             android:id="@+id/action_nav_favorites_to_nav_all_books"
             app:destination="@id/nav_all_books" />
+        <action
+            android:id="@+id/action_nav_favorites_to_nav_about"
+            app:destination="@id/nav_about" />
     </fragment>
 
     <fragment
@@ -41,6 +47,25 @@
             app:destination="@id/nav_favorites" />
         <action
             android:id="@+id/action_nav_started_books_to_nav_all_books"
+            app:destination="@id/nav_all_books" />
+        <action
+            android:id="@+id/action_nav_started_books_to_nav_about"
+            app:destination="@id/nav_about" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.sorykhan.libroread.AboutFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_about">
+        <action
+            android:id="@+id/action_nav_about_to_nav_started_books"
+            app:destination="@id/nav_started_books" />
+        <action
+            android:id="@+id/action_nav_about_to_nav_favorites"
+            app:destination="@id/nav_favorites" />
+        <action
+            android:id="@+id/action_nav_about_to_nav_all_books"
             app:destination="@id/nav_all_books" />
     </fragment>
 </navigation>
